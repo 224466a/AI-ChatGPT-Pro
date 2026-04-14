@@ -2,7 +2,8 @@ from huggingface_hub import InferenceClient
 import os
 
 client = InferenceClient(
-    token=os.getenv("HF_TOKEN")
+    provider="hf-inference",
+    api_key=os.getenv("HF_TOKEN")
 )
 
 def generate_response(prompt, history):
