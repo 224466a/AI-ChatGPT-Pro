@@ -9,7 +9,6 @@ headers = {
 
 def generate_response(prompt, history):
 
-    # Combine conversation
     conversation = ""
     for role, msg in history:
         conversation += f"{role}: {msg}\n"
@@ -24,7 +23,13 @@ def generate_response(prompt, history):
     }
 
     response = requests.post(API_URL, headers=headers, json=payload)
-
     result = response.json()
 
-    return result[0]["generated_text"].split("AI:")[-1].strip()
+    # 🔥 SAFE HANDLING
+    if isinstance(result, dict) and "error" in result:
+        return "⚠️ Model is loading or API busy. Try again in a few seconds."
+
+    if isinstance(result, list):
+        return result[0]["generated_text"].split("AI:")[-1].strip()
+
+    return "⚠️ Unexpected response from AI."
