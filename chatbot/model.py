@@ -1,5 +1,6 @@
 import requests
 import os
+import time
 
 API_URL = "https://api-inference.huggingface.co/models/gpt2"
 
@@ -17,19 +18,16 @@ def generate_response(prompt, history):
 
     payload = {
         "inputs": conversation,
-        "parameters": {
-            "max_new_tokens": 100
-        }
+        "parameters": {"max_new_tokens": 100}
     }
 
-    response = requests.post(API_URL, headers=headers, json=payload)
-    result = response.json()
+    for _ in range(3):  # 🔁 retry 3 times
+        response = requests.post(API_URL, headers=headers, json=payload)
+        result = response.json()
 
-    # 🔥 SAFE HANDLING
-    if isinstance(result, dict) and "error" in result:
-        return "⚠️ Model is loading or API busy. Try again in a few seconds."
+        if isinstance(result, list):
+            return result[0]["generated_text"].split("AI:")[-1].strip()
 
-    if isinstance(result, list):
-        return result[0]["generated_text"].split("AI:")[-1].strip()
+        time.sleep(3)  # wait before retry
 
-    return "⚠️ Unexpected response from AI."
+    return "⚠️ AI is busy. Please try again."
