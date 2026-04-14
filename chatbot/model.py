@@ -19,7 +19,7 @@ def generate_response(prompt, history):
     messages.append({"role": "user", "content": prompt})
 
     response = client.chat_completion(
-        model="mistralai/Mistral-7B-Instruct-v0.1",
+        model="HuggingFaceH4/zephyr-7b-beta",
         messages=messages,
         max_tokens=200
     )
